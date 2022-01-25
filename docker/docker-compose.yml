@@ -1,0 +1,11 @@
+version: "3.7"
+services:
+  postgres_database:
+    container_name: postgres_poc
+    image: postgres:12-alpine
+    ports:
+      - 5440:5432
+    environment:
+      - POSTGRES_USER=pocservice
+      - POSTGRES_PASSWORD=pocservice
+      - POSTGRES_DB=pocservice
