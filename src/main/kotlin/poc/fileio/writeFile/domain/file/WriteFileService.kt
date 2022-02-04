@@ -13,6 +13,7 @@ import poc.fileio.writeFile.domain.repository.BoletoStreamRepository
 import java.io.*
 
 import java.nio.file.*
+import java.util.stream.Stream
 
 
 @Service
@@ -48,22 +49,31 @@ val boletoPaginationRepository: BoletoPaginationRepository) {
     fun createBoletoFileV2(): File{
 
         var file = File("tmpfile.txt")
-        var timeIni = System.currentTimeMillis()
-        var lines = boletoStreamRepository.findAll()
-        logger.info("v2 tempo consulta:${System.currentTimeMillis() - timeIni} ms")
-        var timeIniFile = System.currentTimeMillis()
-        try {
-            val fos = FileOutputStream(file)
-            val bw = BufferedWriter(OutputStreamWriter(fos))
-            lines.forEach {
-                bw.write(it.raw)
+        val fos = FileOutputStream(file)
+        val bw = BufferedWriter(OutputStreamWriter(fos))
+        var timeIniFile=System.currentTimeMillis()
+        boletoStreamRepository.streamBoleto().forEach()  {
+            result ->
+                bw.write(result)
                 bw.newLine()
-            }
-            bw.close()
-        } catch (x: IOException) {
-            System.err.println(x)
         }
-        logger.info("v2 tempo construcao arquivo:${System.currentTimeMillis() - timeIniFile} ms")
+        bw.close()
+        logger.info("v3 tempo construcao arquivo:${System.currentTimeMillis() - timeIniFile} ms")
+        return file
+    }
+
+    @Transactional(readOnly = true)
+    fun createBoletoFileV22(): File{
+
+        var file = File("tmpfile.txt")
+        val fos = FileOutputStream(file)
+        val bw = BufferedWriter(OutputStreamWriter(fos))
+        boletoStreamRepository.findAll().forEach() {
+                result ->
+            bw.write(result.raw)
+            bw.newLine()
+        }
+        bw.close()
         return file
     }
 
